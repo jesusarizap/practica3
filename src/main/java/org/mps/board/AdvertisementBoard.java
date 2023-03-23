@@ -51,6 +51,10 @@ public class AdvertisementBoard {
         else {
             if (advertiserDatabase.advertiserIsRegistered(advertisement.advertiser) &&
                     paymentGateway.advertiserHasFunds(advertisement.advertiser)) {
+                Optional<Advertisement> existingAd = findByTitleAndAdvertiser(advertisement.title, advertisement.advertiser);
+                if (existingAd.isPresent()) {
+                    return;
+                }
                 advertisementList.add(advertisement);
                 paymentGateway.chargeAdvertiser(advertisement.advertiser);
             }
@@ -76,5 +80,9 @@ public class AdvertisementBoard {
      */
     public void deleteAdvertisement(String title, String advertiserName) {
         advertisementList.removeIf(ad -> ad.title.equals(title) && ad.advertiser.equals(advertiserName));
+    }
+
+    private Optional<Advertisement> findByTitleAndAdvertiser(String title, String advertiser) {
+        return advertisementList.stream().filter(ad -> ad.title.equals(title) && ad.advertiser.equals(advertiser)).findFirst();
     }
 }
